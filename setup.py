@@ -4,21 +4,18 @@ with open('README.md', 'r', encoding='utf-8') as fh:
     long_description = fh.read()
 
 setup(
-    name='pgvector',
+    name='lantern',
     version='0.2.4',
-    description='pgvector support for Python',
+    description='Lantern support for Python',
     long_description=long_description,
     long_description_content_type='text/markdown',
-    url='https://github.com/pgvector/pgvector-python',
-    author='Andrew Kane',
-    author_email='andrew@ankane.org',
+    url='https://github.com/lanterndata/lantern-python',
+    author='Di Qi',
+    author_email='di@lantern.dev',
     license='MIT',
     packages=[
-        'pgvector.asyncpg',
         'pgvector.django',
         'pgvector.peewee',
-        'pgvector.psycopg',
-        'pgvector.psycopg2',
         'pgvector.sqlalchemy',
         'pgvector.utils'
     ],

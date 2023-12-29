@@ -8,7 +8,7 @@ from django.forms import ModelForm
 from math import sqrt
 import numpy as np
 import pgvector.django
-from pgvector.django import VectorExtension, VectorField, IvfflatIndex, HnswIndex, L2Distance, MaxInnerProduct, CosineDistance
+from pgvector.django import LanternExtension, LanternExtrasExtension, HnswIndex, L2Distance, MaxInnerProduct, CosineDistance
 from unittest import mock
 
 settings.configure(
@@ -28,12 +28,6 @@ class Item(models.Model):
     class Meta:
         app_label = 'myapp'
         indexes = [
-            IvfflatIndex(
-                name='ivfflat_idx',
-                fields=['embedding'],
-                lists=100,
-                opclasses=['vector_l2_ops']
-            ),
             HnswIndex(
                 name='hnsw_idx',
                 fields=['embedding'],
@@ -51,7 +45,7 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        VectorExtension(),
+        LanternExtension(),
         migrations.CreateModel(
             name='Item',
             fields=[
@@ -61,16 +55,11 @@ class Migration(migrations.Migration):
         ),
         migrations.AddIndex(
             model_name='item',
-            index=pgvector.django.IvfflatIndex(fields=['embedding'], lists=1, name='ivfflat_idx', opclasses=['vector_l2_ops']),
-        ),
-        migrations.AddIndex(
-            model_name='item',
             index=pgvector.django.HnswIndex(fields=['embedding'], m=16, ef_construction=64, name='hnsw_idx', opclasses=['vector_l2_ops']),
         )
     ]
 
 
-# probably a better way to do this
 migration = Migration('initial', 'myapp')
 loader = MigrationLoader(connection, replace_migrations=False)
 loader.graph.add_node(('myapp', migration.name), migration)

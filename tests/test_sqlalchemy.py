@@ -7,7 +7,7 @@ from sqlalchemy.ext.asyncio import async_sessionmaker, create_async_engine
 from sqlalchemy.orm import declarative_base, mapped_column, Session
 from sqlalchemy.sql import func
 
-engine = create_engine('postgresql+psycopg2://localhost/pgvector_python_test')
+engine = create_engine('postgresql+psycopg2://localhost/postgres')
 with Session(engine) as session:
     session.execute(text('CREATE EXTENSION IF NOT EXISTS vector'))
     session.commit()
@@ -221,7 +221,7 @@ class TestSqlalchemy:
 
     @pytest.mark.asyncio
     async def test_async(self):
-        engine = create_async_engine('postgresql+psycopg://localhost/pgvector_python_test')
+        engine = create_async_engine('postgresql+psycopg://localhost/postgres')
         async_session = async_sessionmaker(engine, expire_on_commit=False)
 
         async with async_session() as session:

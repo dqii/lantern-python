@@ -15,7 +15,7 @@ settings.configure(
     DATABASES={
         'default': {
             'ENGINE': 'django.db.backends.postgresql',
-            'NAME': 'pgvector_python_test',
+            'NAME': 'postgres',
         }
     }
 )

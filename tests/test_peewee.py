@@ -3,7 +3,7 @@ import numpy as np
 from peewee import Model, PostgresqlDatabase, fn
 from pgvector.peewee import VectorField
 
-db = PostgresqlDatabase('pgvector_python_test')
+db = PostgresqlDatabase('postgres')
 
 
 class BaseModel(Model):

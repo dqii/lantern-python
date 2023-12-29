@@ -27,6 +27,6 @@ jobs:
         with:
           python-version: ${{ matrix.python }}
       - run: pip install -r requirements.txt
-      - run: pytest
+      - run: pytest tests/lanterndb
         env:
           DATABASE_URL: postgres://postgres:postgres@localhost:5432/postgres

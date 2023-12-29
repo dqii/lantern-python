@@ -27,4 +27,4 @@ jobs:
           cd pgvector
           make
           sudo make install
-      - run: pytest tests/pgvector
+      - run: pytest tests/pgvector_tests

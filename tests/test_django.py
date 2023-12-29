@@ -7,8 +7,8 @@ from django.db.migrations.loader import MigrationLoader
 from django.forms import ModelForm
 from math import sqrt
 import numpy as np
-import pgvector.django
-from pgvector.django import LanternExtension, LanternExtrasExtension, HnswIndex, L2Distance, MaxInnerProduct, CosineDistance
+import lanterndb.django
+from lanterndb.django import LanternExtension, LanternExtrasExtension, HnswIndex, L2Distance, MaxInnerProduct, CosineDistance
 from unittest import mock
 
 settings.configure(

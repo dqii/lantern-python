@@ -14,7 +14,7 @@ setup(
     author_email='di@lantern.dev',
     license='MIT',
     packages=[
-        'pgvector.django',
+        'lanterndb.django',
         'pgvector.peewee',
         'pgvector.sqlalchemy',
         'pgvector.utils'

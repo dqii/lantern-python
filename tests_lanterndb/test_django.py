@@ -38,8 +38,9 @@ class Item(models.Model):
                 name='hnsw_idx',
                 fields=['embedding'],
                 m=16,
+                ef=64,
                 ef_construction=100,
-                opclasses=['vector_l2_ops']
+                opclasses=['dist_l2sq_ops']
             )
         ]
 
@@ -61,7 +62,7 @@ class Migration(migrations.Migration):
         ),
         migrations.AddIndex(
             model_name='item',
-            index=lanterndb.django.HnswIndex(fields=['embedding'], m=16, ef_construction=64, name='hnsw_idx', opclasses=['vector_l2_ops']),
+            index=lanterndb.django.HnswIndex(fields=['embedding'], m=16, ef_construction=64, name='hnsw_idx', opclasses=['dist_l2sq_ops']),
         )
     ]
 

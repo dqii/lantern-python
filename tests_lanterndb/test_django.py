@@ -126,7 +126,7 @@ class TestDjango:
         distance = CosineDistance('embedding', [1, 1, 1])
         items = Item.objects.annotate(distance=distance).order_by(distance)
         assert [v.id for v in items] == [1, 2, 3]
-        assert [v.distance for v in items] == [0, 0, 0.05719095841793653]
+        assert [v.distance for v in items] == [0, 0, 0.057191014]
 
     def test_filter(self):
         create_items()

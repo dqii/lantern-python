@@ -1,5 +1,5 @@
 from peewee import Expression, Field, Value
-from ..utils import from_db, to_db
+from pgvector.utils import from_db, to_db
 
 
 class VectorField(Field):

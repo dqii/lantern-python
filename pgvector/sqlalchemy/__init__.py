@@ -1,6 +1,6 @@
 from sqlalchemy.dialects.postgresql.base import ischema_names
 from sqlalchemy.types import UserDefinedType, Float
-from ..utils import from_db, to_db
+from pgvector.utils import from_db, to_db
 
 __all__ = ['Vector']
 

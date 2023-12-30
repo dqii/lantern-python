@@ -1,7 +1,7 @@
 from django.contrib.postgres.operations import CreateExtension
 from django.contrib.postgres.indexes import PostgresIndex
 from django.db.models import FloatField, Func, Value
-from ..utils import to_db
+from lanterndb.utils import to_db
 
 
 __all__ = ['LanternExtension', 'LanternExtrasExtension', 'L2Distance', 'MaxInnerProduct', 'CosineDistance']

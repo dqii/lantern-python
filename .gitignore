@@ -5,3 +5,5 @@ venv/
 .cache/
 *.pyc
 __pycache__
+
+.cosine

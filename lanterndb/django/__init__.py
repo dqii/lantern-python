@@ -7,6 +7,7 @@ from lanterndb.utils import to_db
 __all__ = ['LanternExtension', 'LanternExtrasExtension', 'L2Distance', 'CosineDistance']
 
 
+# TODO: Remove this once we support double precision
 class RealField(FloatField):
     description = "Single precision floating point number"
 

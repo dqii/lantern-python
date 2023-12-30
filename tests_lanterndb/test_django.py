@@ -7,8 +7,8 @@ from django.db.migrations.loader import MigrationLoader
 from django.forms import ModelForm
 from math import sqrt
 import numpy as np
-import pgvector.django
-from pgvector.django import VectorExtension, VectorField, IvfflatIndex, HnswIndex, L2Distance, MaxInnerProduct, CosineDistance
+import lanterndb.django
+from lanterndb.django import VectorExtension, VectorField, IvfflatIndex, HnswIndex, L2Distance, MaxInnerProduct, CosineDistance
 from unittest import mock
 
 settings.configure(
@@ -56,16 +56,16 @@ class Migration(migrations.Migration):
             name='Item',
             fields=[
                 ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('embedding', pgvector.django.VectorField(dimensions=3, null=True)),
+                ('embedding', lanterndb.django.VectorField(dimensions=3, null=True)),
             ],
         ),
         migrations.AddIndex(
             model_name='item',
-            index=pgvector.django.IvfflatIndex(fields=['embedding'], lists=1, name='ivfflat_idx', opclasses=['vector_l2_ops']),
+            index=lanterndb.django.IvfflatIndex(fields=['embedding'], lists=1, name='ivfflat_idx', opclasses=['vector_l2_ops']),
         ),
         migrations.AddIndex(
             model_name='item',
-            index=pgvector.django.HnswIndex(fields=['embedding'], m=16, ef_construction=64, name='hnsw_idx', opclasses=['vector_l2_ops']),
+            index=lanterndb.django.HnswIndex(fields=['embedding'], m=16, ef_construction=64, name='hnsw_idx', opclasses=['vector_l2_ops']),
         )
     ]
 

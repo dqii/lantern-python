@@ -15,7 +15,7 @@ setup(
     license='MIT',
     packages=[
         'pgvector.asyncpg',
-        'pgvector.django',
+        'lanterndb.django',
         'pgvector.peewee',
         'pgvector.psycopg',
         'pgvector.psycopg2',

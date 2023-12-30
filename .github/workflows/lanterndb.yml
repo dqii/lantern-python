@@ -1,4 +1,4 @@
-name: build
+name: lanterndb
 on:
   push:
     branches: [ main ]

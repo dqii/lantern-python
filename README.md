@@ -96,7 +96,7 @@ for result in results:
     print(result.text_embedding)
 ```
 
-## SQLAlchemy
+## TODO: SQLAlchemy
 
 Enable the extension(s)
 
@@ -166,7 +166,7 @@ index.create(engine)
 
 Use `vector_ip_ops` for inner product and `vector_cosine_ops` for cosine distance
 
-## SQLModel
+## TODO: SQLModel
 
 Enable the extension
 
@@ -200,7 +200,7 @@ session.exec(select(Item).order_by(Item.embedding.l2_distance([3, 1, 2])).limit(
 
 Also supports `max_inner_product` and `cosine_distance`
 
-## Psycopg 3
+## TODO: Psycopg 3
 
 Enable the extension
 
@@ -243,7 +243,7 @@ Get the nearest neighbors to a vector
 conn.execute('SELECT * FROM items ORDER BY embedding <-> %s LIMIT 5', (embedding,)).fetchall()
 ```
 
-## Psycopg 2
+## TODO: Psycopg 2
 
 Enable the extension
 
@@ -281,7 +281,7 @@ cur.execute('SELECT * FROM items ORDER BY embedding <-> %s LIMIT 5', (embedding,
 cur.fetchall()
 ```
 
-## asyncpg
+## TODO: asyncpg
 
 Enable the extension
 
@@ -326,7 +326,7 @@ Get the nearest neighbors to a vector
 await conn.fetch('SELECT * FROM items ORDER BY embedding <-> $1 LIMIT 5', embedding)
 ```
 
-## Peewee
+## TODO: Peewee
 
 Add a vector column
 

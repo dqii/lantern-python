@@ -24,7 +24,7 @@ django.setup()
 
 
 class Item(models.Model):
-    embedding = VectorField(dimensions=3)
+    embedding = ArrayField(FloatField(), size=3, null=True)
 
     class Meta:
         app_label = 'myapp'

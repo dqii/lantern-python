@@ -1,17 +1,19 @@
-# pgvector-python
+# lantern-python
 
-[pgvector](https://github.com/pgvector/pgvector) support for Python
+[Lantern](https://github.com/lanterndata/lantern) support for Python.
 
-Supports [Django](https://github.com/django/django), [SQLAlchemy](https://github.com/sqlalchemy/sqlalchemy), [SQLModel](https://github.com/tiangolo/sqlmodel), [Psycopg 3](https://github.com/psycopg/psycopg), [Psycopg 2](https://github.com/psycopg/psycopg2), [asyncpg](https://github.com/MagicStack/asyncpg), and [Peewee](https://github.com/coleifer/peewee)
+It is based on [pgvector](https://github.com/lanterndata/lantern)'s [Python client](https://github.com/pgvector/pgvector-python).
 
-[![Build Status](https://github.com/pgvector/pgvector-python/workflows/build/badge.svg?branch=master)](https://github.com/pgvector/pgvector-python/actions)
+This library adds support for [Django](https://github.com/django/django), [SQLAlchemy](https://github.com/sqlalchemy/sqlalchemy), [SQLModel](https://github.com/tiangolo/sqlmodel), and [Peewee](https://github.com/coleifer/peewee). [Psycopg 3](https://github.com/psycopg/psycopg), [Psycopg 2](https://github.com/psycopg/psycopg2), and [asyncpg](https://github.com/MagicStack/asyncpg) are supported out of the box; installing this library is not necessary.
+
+[![Build Status](https://github.com/lanterndata/lantern-python/workflows/build/badge.svg?branch=main)](https://github.com/lanterndata/lantern-python/actions)
 
 ## Installation
 
 Run:
 
 ```sh
-pip install pgvector
+pip install lanterndb
 ```
 
 And follow the instructions for your database library:
@@ -19,117 +21,88 @@ And follow the instructions for your database library:
 - [Django](#django)
 - [SQLAlchemy](#sqlalchemy)
 - [SQLModel](#sqlmodel)
-- [Psycopg 3](#psycopg-3)
-- [Psycopg 2](#psycopg-2)
-- [asyncpg](#asyncpg)
 - [Peewee](#peewee)
 
-Or check out some examples:
-
-- [Embeddings](https://github.com/pgvector/pgvector-python/blob/master/examples/openai_embeddings.py) with OpenAI
-- [Sentence embeddings](https://github.com/pgvector/pgvector-python/blob/master/examples/sentence_embeddings.py) with SentenceTransformers
-- [Hybrid search](https://github.com/pgvector/pgvector-python/blob/master/examples/hybrid_search_rrf.py) with SentenceTransformers (Reciprocal Rank Fusion)
-- [Hybrid search](https://github.com/pgvector/pgvector-python/blob/master/examples/hybrid_search.py) with SentenceTransformers (cross-encoder)
-- [Image search](https://github.com/pgvector/pgvector-python/blob/master/examples/pytorch_image_search.py) with PyTorch
-- [Implicit feedback recommendations](https://github.com/pgvector/pgvector-python/blob/master/examples/implicit_recs.py) with Implicit
-- [Explicit feedback recommendations](https://github.com/pgvector/pgvector-python/blob/master/examples/surprise_recs.py) with Surprise
-- [Recommendations](https://github.com/pgvector/pgvector-python/blob/master/examples/lightfm_recs.py) with LightFM
-- [Horizontal scaling](https://github.com/pgvector/pgvector-python/blob/master/examples/citus.py) with Citus
 
 ## Django
 
-Create a migration to enable the extension
+Create a migration to enable the extension(s)
 
 ```python
-from pgvector.django import VectorExtension
+from django.db import migrations
+from lanterndb.django import LanternExtension, LanternExtrasExtension
 
 class Migration(migrations.Migration):
     operations = [
-        VectorExtension()
+        LanternExtension(),
+        LanternExtrasExtension(),
     ]
 ```
 
-Add a vector field to your model
+Add an embedding field to your model
 
 ```python
-from pgvector.django import VectorField
+from django.db import models
+from django.contrib.postgres.fields import ArrayField
 
-class Item(models.Model):
-    embedding = VectorField(dimensions=3)
+class Book(models.Model):
+    book_embedding = ArrayField(models.FloatField(), size=128)
 ```
 
 Insert a vector
 
 ```python
-item = Item(embedding=[1, 2, 3])
-item.save()
+book = Book(book_embedding=[1, 2, 3])
 ```
 
-Get the nearest neighbors to a vector
+Find nearest rows with `L2Distance`, `CosineDistance`, or `HammingDistance`
 
 ```python
-from pgvector.django import L2Distance
+from lanterndb.django import L2Distance
 
-Item.objects.order_by(L2Distance('embedding', [3, 1, 2]))[:5]
+Book.objects.order_by(L2Distance('embedding', [3, 1, 2]))[:5]
 ```
 
-Also supports `MaxInnerProduct` and `CosineDistance`
-
-Get the distance
+Add a vector index
 
 ```python
-Item.objects.annotate(distance=L2Distance('embedding', [3, 1, 2]))
-```
+from django.db import models
+from lanterndb.django import HnswIndex
 
-Get items within a certain distance
-
-```python
-Item.objects.alias(distance=L2Distance('embedding', [3, 1, 2])).filter(distance__lt=5)
-```
-
-Average vectors
-
-```python
-from django.db.models import Avg
-
-Item.objects.aggregate(Avg('embedding'))
-```
-
-Also supports `Sum`
-
-Add an approximate index
-
-```python
-from pgvector.django import IvfflatIndex, HnswIndex
-
-class Item(models.Model):
+class Book(models.Model):
     class Meta:
         indexes = [
-            IvfflatIndex(
-                name='my_index',
-                fields=['embedding'],
-                lists=100,
-                opclasses=['vector_l2_ops']
-            ),
-            # or
             HnswIndex(
-                name='my_index',
-                fields=['embedding'],
-                m=16,
-                ef_construction=64,
-                opclasses=['vector_l2_ops']
+                name='book_embedding_index',
+                fields=['book_embedding'],
+                m=2,
+                ef_construction=10,
+                ef=4,
+                dim=3,
+                opclasses=['dist_l2sq_ops']
             )
         ]
 ```
 
-Use `vector_ip_ops` for inner product and `vector_cosine_ops` for cosine distance
-
-## SQLAlchemy
-
-Enable the extension
+Generate one-off embeddings (note that these cannot be used unless the Lantern Extras extension is enabled as well)
 
 ```python
-session.execute(text('CREATE EXTENSION IF NOT EXISTS vector'))
+from django.db import models
+
+results = Book.objects.annotate(
+    text_embedding=TextEmbedding('BAAI/bge-small-en', 'My text input')
+)
+for result in results:
+    print(result.text_embedding)
+```
+
+## TODO: SQLAlchemy
+
+Enable the extension(s)
+
+```python
+session.execute(text('CREATE EXTENSION IF NOT EXISTS lantern'))
+session.execute(text('CREATE EXTENSION IF NOT EXISTS lantern_extras'))
 ```
 
 Add a vector column
@@ -183,12 +156,6 @@ Add an approximate index
 
 ```python
 index = Index('my_index', Item.embedding,
-    postgresql_using='ivfflat',
-    postgresql_with={'lists': 100},
-    postgresql_ops={'embedding': 'vector_l2_ops'}
-)
-# or
-index = Index('my_index', Item.embedding,
     postgresql_using='hnsw',
     postgresql_with={'m': 16, 'ef_construction': 64},
     postgresql_ops={'embedding': 'vector_l2_ops'}
@@ -199,7 +166,7 @@ index.create(engine)
 
 Use `vector_ip_ops` for inner product and `vector_cosine_ops` for cosine distance
 
-## SQLModel
+## TODO: SQLModel
 
 Enable the extension
 
@@ -233,7 +200,7 @@ session.exec(select(Item).order_by(Item.embedding.l2_distance([3, 1, 2])).limit(
 
 Also supports `max_inner_product` and `cosine_distance`
 
-## Psycopg 3
+## TODO: Psycopg 3
 
 Enable the extension
 
@@ -276,13 +243,14 @@ Get the nearest neighbors to a vector
 conn.execute('SELECT * FROM items ORDER BY embedding <-> %s LIMIT 5', (embedding,)).fetchall()
 ```
 
-## Psycopg 2
+## TODO: Psycopg 2
 
 Enable the extension
 
 ```python
 cur = conn.cursor()
-cur.execute('CREATE EXTENSION IF NOT EXISTS vector')
+cur.execute('CREATE EXTENSION IF NOT EXISTS lantern')
+cur.execute('CREATE EXTENSION IF NOT EXISTS lantern_extras')
 ```
 
 Register the vector type with your connection or cursor
@@ -313,12 +281,13 @@ cur.execute('SELECT * FROM items ORDER BY embedding <-> %s LIMIT 5', (embedding,
 cur.fetchall()
 ```
 
-## asyncpg
+## TODO: asyncpg
 
 Enable the extension
 
 ```python
-await conn.execute('CREATE EXTENSION IF NOT EXISTS vector')
+await conn.execute('CREATE EXTENSION IF NOT EXISTS lantern')
+await conn.execute('CREATE EXTENSION IF NOT EXISTS lantern_extras')
 ```
 
 Register the vector type with your connection
@@ -357,7 +326,7 @@ Get the nearest neighbors to a vector
 await conn.fetch('SELECT * FROM items ORDER BY embedding <-> $1 LIMIT 5', embedding)
 ```
 
-## Peewee
+## TODO: Peewee
 
 Add a vector column
 
@@ -411,26 +380,3 @@ Item.add_index('embedding vector_l2_ops', using='hnsw')
 ```
 
 Use `vector_ip_ops` for inner product and `vector_cosine_ops` for cosine distance
-
-## History
-
-View the [changelog](https://github.com/pgvector/pgvector-python/blob/master/CHANGELOG.md)
-
-## Contributing
-
-Everyone is encouraged to help improve this project. Here are a few ways you can help:
-
-- [Report bugs](https://github.com/pgvector/pgvector-python/issues)
-- Fix bugs and [submit pull requests](https://github.com/pgvector/pgvector-python/pulls)
-- Write, clarify, or fix documentation
-- Suggest or add new features
-
-To get started with development:
-
-```sh
-git clone https://github.com/pgvector/pgvector-python.git
-cd pgvector-python
-pip install -r requirements.txt
-createdb pgvector_python_test
-pytest
-```

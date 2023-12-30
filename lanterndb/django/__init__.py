@@ -7,7 +7,7 @@ from lanterndb.utils import to_db
 __all__ = ['LanternExtension', 'LanternExtrasExtension', 'L2Distance', 'MaxInnerProduct', 'CosineDistance']
 
 
-class RealField(models.FloatField):
+class RealField(FloatField):
     description = "Single precision floating point number"
 
     def db_type(self, connection):
@@ -62,7 +62,7 @@ class HnswIndex(PostgresIndex):
 
 
 class DistanceBase(Func):
-    output_field = FloatField()
+    output_field = RealField()
 
     def __init__(self, expression, vector, **extra):
         if not hasattr(vector, 'resolve_expression'):

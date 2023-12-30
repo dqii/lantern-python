@@ -10,7 +10,7 @@ from django.forms import ModelForm
 from math import sqrt
 import numpy as np
 import lanterndb.django
-from lanterndb.django import LanternExtension, LanternExtrasExtension, HnswIndex, L2Distance, MaxInnerProduct, CosineDistance, RealField
+from lanterndb.django import LanternExtension, LanternExtrasExtension, HnswIndex, L2Distance, CosineDistance, RealField
 from unittest import mock
 
 settings.configure(
@@ -121,13 +121,6 @@ class TestDjango:
         items = Item.objects.annotate(distance=distance).order_by(distance)
         assert [v.id for v in items] == [1, 3, 2]
         assert [v.distance for v in items] == [0, 1, sqrt(3)]
-
-    def test_max_inner_product(self):
-        create_items()
-        distance = MaxInnerProduct('embedding', [1, 1, 1])
-        items = Item.objects.annotate(distance=distance).order_by(distance)
-        assert [v.id for v in items] == [2, 3, 1]
-        assert [v.distance for v in items] == [-6, -4, -3]
 
     def test_cosine_distance(self):
         create_items()

@@ -4,7 +4,7 @@ from django.db.models import FloatField, Func, Value
 from lanterndb.utils import to_db
 
 
-__all__ = ['LanternExtension', 'LanternExtrasExtension', 'L2Distance', 'MaxInnerProduct', 'CosineDistance']
+__all__ = ['LanternExtension', 'LanternExtrasExtension', 'L2Distance', 'CosineDistance']
 
 
 class RealField(FloatField):
@@ -75,9 +75,9 @@ class L2Distance(DistanceBase):
     arg_joiner = ' <-> '
 
 
-class MaxInnerProduct(DistanceBase):
+class HammingDistance(DistanceBase):
     function = ''
-    arg_joiner = ' <#> '
+    arg_joiner = ' <+> '
 
 
 class CosineDistance(DistanceBase):

@@ -55,7 +55,7 @@ Insert a vector
 book = Book(book_embedding=[1, 2, 3])
 ```
 
-Find nearest rows with `L2Distance`, `MaxInnerProduct`, or `MinInnerProduct`
+Find nearest rows with `L2Distance`, `CosineDistance`, or `HammingDistance`
 
 ```python
 from lanterndb.django import L2Distance

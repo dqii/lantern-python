@@ -3,14 +3,14 @@ import django
 from django.conf import settings
 from django.core import serializers
 from django.db import connection, migrations, models
-from django.db.models import Avg, Sum, FloatField
+from django.db.models import Avg, Sum
 from django.contrib.postgres.fields import ArrayField
 from django.db.migrations.loader import MigrationLoader
 from django.forms import ModelForm
 from math import sqrt
 import numpy as np
 import lanterndb.django
-from lanterndb.django import LanternExtension, LanternExtrasExtension, HnswIndex, L2Distance, MaxInnerProduct, CosineDistance
+from lanterndb.django import LanternExtension, LanternExtrasExtension, HnswIndex, L2Distance, MaxInnerProduct, CosineDistance, RealField
 from unittest import mock
 
 settings.configure(
@@ -29,7 +29,7 @@ django.setup()
 
 
 class Item(models.Model):
-    embedding = ArrayField(FloatField(), size=3, null=True)
+    embedding = ArrayField(RealField(), size=3, null=True)
 
     class Meta:
         app_label = 'myapp'
@@ -57,7 +57,7 @@ class Migration(migrations.Migration):
             name='Item',
             fields=[
                 ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('embedding', ArrayField(FloatField(), size=3, null=True)),
+                ('embedding', ArrayField(RealField(), size=3, null=True)),
             ],
         ),
         migrations.AddIndex(

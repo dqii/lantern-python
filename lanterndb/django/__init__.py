@@ -7,6 +7,15 @@ from lanterndb.utils import to_db
 __all__ = ['LanternExtension', 'LanternExtrasExtension', 'L2Distance', 'MaxInnerProduct', 'CosineDistance']
 
 
+class RealField(models.FloatField):
+    description = "Single precision floating point number"
+
+    def db_type(self, connection):
+        if connection.settings_dict['ENGINE'] == 'django.db.backends.postgresql':
+            return 'real'
+        return super().db_type(connection)
+
+
 class LanternExtension(CreateExtension):
     def __init__(self):
         self.name = 'lantern'

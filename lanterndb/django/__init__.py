@@ -1,108 +1,54 @@
 from django.contrib.postgres.operations import CreateExtension
 from django.contrib.postgres.indexes import PostgresIndex
-from django.db.models import Field, FloatField, Func, Value
-import numpy as np
-from .forms import VectorFormField
-from ..utils import from_db, to_db
-
-__all__ = ['VectorExtension', 'VectorField', 'IvfflatIndex', 'HnswIndex', 'L2Distance', 'MaxInnerProduct', 'CosineDistance']
+from django.db.models import FloatField, Func, Value
+from lanterndb.utils import to_db
 
 
-class VectorExtension(CreateExtension):
+__all__ = ['LanternExtension', 'LanternExtrasExtension', 'L2Distance', 'MaxInnerProduct', 'CosineDistance']
+
+
+class LanternExtension(CreateExtension):
     def __init__(self):
-        self.name = 'vector'
+        self.name = 'lantern'
 
 
-# https://docs.djangoproject.com/en/4.2/howto/custom-model-fields/
-class VectorField(Field):
-    description = 'Vector'
-    empty_strings_allowed = False
-
-    def __init__(self, *args, dimensions=None, **kwargs):
-        self.dimensions = dimensions
-        super().__init__(*args, **kwargs)
-
-    def deconstruct(self):
-        name, path, args, kwargs = super().deconstruct()
-        if self.dimensions is not None:
-            kwargs['dimensions'] = self.dimensions
-        return name, path, args, kwargs
-
-    def db_type(self, connection):
-        if self.dimensions is None:
-            return 'vector'
-        return 'vector(%d)' % self.dimensions
-
-    def from_db_value(self, value, expression, connection):
-        return from_db(value)
-
-    def to_python(self, value):
-        if isinstance(value, list):
-            return np.array(value, dtype=np.float32)
-        return from_db(value)
-
-    def get_prep_value(self, value):
-        return to_db(value)
-
-    def value_to_string(self, obj):
-        return self.get_prep_value(self.value_from_object(obj))
-
-    def validate(self, value, model_instance):
-        if isinstance(value, np.ndarray):
-            value = value.tolist()
-        super().validate(value, model_instance)
-
-    def run_validators(self, value):
-        if isinstance(value, np.ndarray):
-            value = value.tolist()
-        super().run_validators(value)
-
-    def formfield(self, **kwargs):
-        return super().formfield(form_class=VectorFormField, **kwargs)
-
-
-class IvfflatIndex(PostgresIndex):
-    suffix = 'ivfflat'
-
-    def __init__(self, *expressions, lists=None, **kwargs):
-        self.lists = lists
-        super().__init__(*expressions, **kwargs)
-
-    def deconstruct(self):
-        path, args, kwargs = super().deconstruct()
-        if self.lists is not None:
-            kwargs['lists'] = self.lists
-        return path, args, kwargs
-
-    def get_with_params(self):
-        with_params = []
-        if self.lists is not None:
-            with_params.append('lists = %d' % self.lists)
-        return with_params
+class LanternExtrasExtension(CreateExtension):
+    def __init__(self):
+        self.name = 'lantern_extras'
 
 
 class HnswIndex(PostgresIndex):
     suffix = 'hnsw'
 
-    def __init__(self, *expressions, m=None, ef_construction=None, **kwargs):
+    def __init__(self, *expressions, m=None, ef=None, ef_construction=None, dim=None, **kwargs):
         self.m = m
         self.ef_construction = ef_construction
+        self.ef = ef
+        self.dim = dim
         super().__init__(*expressions, **kwargs)
 
     def deconstruct(self):
         path, args, kwargs = super().deconstruct()
         if self.m is not None:
             kwargs['m'] = self.m
+        if self.ef is not None:
+            kwargs['ef'] = self.ef
         if self.ef_construction is not None:
             kwargs['ef_construction'] = self.ef_construction
+        if self.dim is not None:
+            kwargs['dim'] = self.dim
         return path, args, kwargs
 
     def get_with_params(self):
         with_params = []
         if self.m is not None:
             with_params.append('m = %d' % self.m)
+        if self.ef is not None:
+            with_params.append('ef = %d' % self.ef)
         if self.ef_construction is not None:
             with_params.append('ef_construction = %d' % self.ef_construction)
+        if self.dim is not None:
+            with_params.append('dim = %d' % self.dim)
         return with_params
 
 
@@ -128,3 +74,21 @@ class MaxInnerProduct(DistanceBase):
 class CosineDistance(DistanceBase):
     function = ''
     arg_joiner = ' <=> '
+
+
+class TextEmbedding(Func):
+    function = 'text_embedding'
+
+    def __init__(self, model, text, **extra):
+        if not hasattr(text, 'resolve_expression'):
+            text = Value(text)
+        super().__init__(Value(model), text, **extra)
+
+
+class ImageEmbedding(Func):
+    function = 'image_embedding'
+
+    def __init__(self, model, text, **extra):
+        if not hasattr(text, 'resolve_expression'):
+            text = Value(text)
+        super().__init__(Value(model), text, **extra) 

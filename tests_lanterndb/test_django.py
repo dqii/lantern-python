@@ -2,20 +2,21 @@ import django
 from django.conf import settings
 from django.core import serializers
 from django.db import connection, migrations, models
-from django.db.models import Avg, Sum
+from django.db.models import Avg, Sum, FloatField
+from django.contrib.postgres.fields import ArrayField
 from django.db.migrations.loader import MigrationLoader
 from django.forms import ModelForm
 from math import sqrt
 import numpy as np
 import lanterndb.django
-from lanterndb.django import VectorExtension, VectorField, IvfflatIndex, HnswIndex, L2Distance, MaxInnerProduct, CosineDistance
+from lanterndb.django import LanternExtension, LanternExtrasExtension, HnswIndex, L2Distance, MaxInnerProduct, CosineDistance
 from unittest import mock
 
 settings.configure(
     DATABASES={
         'default': {
             'ENGINE': 'django.db.backends.postgresql',
-            'NAME': 'pgvector_python_test',
+            'NAME': 'postgres',
         }
     }
 )
@@ -28,12 +29,6 @@ class Item(models.Model):
     class Meta:
         app_label = 'myapp'
         indexes = [
-            IvfflatIndex(
-                name='ivfflat_idx',
-                fields=['embedding'],
-                lists=100,
-                opclasses=['vector_l2_ops']
-            ),
             HnswIndex(
                 name='hnsw_idx',
                 fields=['embedding'],
@@ -51,17 +46,13 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        VectorExtension(),
+        LanternExtension(),
         migrations.CreateModel(
             name='Item',
             fields=[
                 ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('embedding', lanterndb.django.VectorField(dimensions=3, null=True)),
+                ('embedding', ArrayField(FloatField(), size=3, null=True)),
             ],
-        ),
-        migrations.AddIndex(
-            model_name='item',
-            index=lanterndb.django.IvfflatIndex(fields=['embedding'], lists=1, name='ivfflat_idx', opclasses=['vector_l2_ops']),
         ),
         migrations.AddIndex(
             model_name='item',
@@ -70,7 +61,6 @@ class Migration(migrations.Migration):
     ]
 
 
-# probably a better way to do this
 migration = Migration('initial', 'myapp')
 loader = MigrationLoader(connection, replace_migrations=False)
 loader.graph.add_node(('myapp', migration.name), migration)

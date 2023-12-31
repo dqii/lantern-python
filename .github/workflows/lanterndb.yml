@@ -28,3 +28,9 @@ jobs:
           python-version: ${{ matrix.python }}
       - run: pip install -r requirements.txt
       - run: pytest tests_lanterndb
+        env:
+          DB_HOST: localhost
+          DB_PORT: 5432
+          DB_USER: postgres
+          DB_PASSWORD: postgres
+          DB_NAME: postgres

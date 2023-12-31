@@ -6,7 +6,7 @@ It is based on [pgvector](https://github.com/lanterndata/lantern)'s [Python clie
 
 This library adds support for [Django](https://github.com/django/django), [SQLAlchemy](https://github.com/sqlalchemy/sqlalchemy), [SQLModel](https://github.com/tiangolo/sqlmodel), and [Peewee](https://github.com/coleifer/peewee). [Psycopg 3](https://github.com/psycopg/psycopg), [Psycopg 2](https://github.com/psycopg/psycopg2), and [asyncpg](https://github.com/MagicStack/asyncpg) are supported out of the box; installing this library is not necessary.
 
-[![Build Status](https://github.com/lanterndata/lantern-python/workflows/build/badge.svg?branch=main)](https://github.com/lanterndata/lantern-python/actions)
+[![Build Status](https://github.com/lanterndata/lantern-python/workflows/lanterndb/badge.svg?branch=main)](https://github.com/lanterndata/lantern-python/actions)
 
 ## Installation
 
@@ -200,7 +200,7 @@ session.exec(select(Item).order_by(Item.embedding.l2_distance([3, 1, 2])).limit(
 
 Also supports `max_inner_product` and `cosine_distance`
 
-## TODO: Psycopg 3
+## Psycopg 3
 
 Enable the extension
 
@@ -227,7 +227,7 @@ Get the nearest neighbors to a vector
 conn.execute('SELECT * FROM items ORDER BY embedding <-> %s LIMIT 5', (embedding,)).fetchall()
 ```
 
-## TODO: Psycopg 2
+## Psycopg 2
 
 Enable the extension
 
@@ -237,24 +237,16 @@ cur.execute('CREATE EXTENSION IF NOT EXISTS lantern')
 cur.execute('CREATE EXTENSION IF NOT EXISTS lantern_extras')
 ```
 
-Register the vector type with your connection or cursor
-
-```python
-from pgvector.psycopg2 import register_vector
-
-register_vector(conn)
-```
-
 Create a table
 
 ```python
-cur.execute('CREATE TABLE items (id bigserial PRIMARY KEY, embedding vector(3))')
+cur.execute('CREATE TABLE items (id bigserial PRIMARY KEY, embedding REAL[3])')
 ```
 
 Insert a vector
 
 ```python
-embedding = np.array([1, 2, 3])
+embedding = [1, 2, 3]
 cur.execute('INSERT INTO items (embedding) VALUES (%s)', (embedding,))
 ```
 

@@ -15,9 +15,6 @@ conn.execute('CREATE EXTENSION IF NOT EXISTS lantern')
 conn.execute('DROP TABLE IF EXISTS items')
 conn.execute('CREATE TABLE items (id bigserial PRIMARY KEY, embedding REAL[3])')
 
-register_vector(conn)
-
-
 class TestPsycopg:
     def setup_method(self, test_method):
         conn.execute('DELETE FROM items')
@@ -44,8 +41,6 @@ class TestPsycopg:
         await conn.execute('CREATE EXTENSION IF NOT EXISTS lantern')
         await conn.execute('DROP TABLE IF EXISTS items')
         await conn.execute('CREATE TABLE items (id bigserial PRIMARY KEY, embedding REAL[3])')
-
-        await register_vector_async(conn)
 
         embedding = np.array([1.5, 2, 3])
         await conn.execute('INSERT INTO items (embedding) VALUES (%s), (NULL)', (embedding,))

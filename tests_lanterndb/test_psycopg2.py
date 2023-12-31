@@ -20,7 +20,7 @@ class TestPsycopg2:
         cur.execute('DELETE FROM items')
 
     def test_works(self):
-        embedding = np.array([1.5, 2.0, 3.0])
+        embedding = [1.5, 2.0, 3.0]
         cur.execute('INSERT INTO items (embedding) VALUES (%s), (NULL)', (embedding,))
 
         cur.execute('SELECT * FROM items ORDER BY id')

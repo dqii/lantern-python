@@ -20,7 +20,7 @@ class TestPsycopg:
         conn.execute('DELETE FROM items')
 
     def test_works(self):
-        embedding = [1.5, 2.0, 3.0]
+        embedding = [1, 2, 3]
         conn.execute('INSERT INTO items (embedding) VALUES (%s), (NULL)', (embedding,))
 
         res = conn.execute('SELECT * FROM items ORDER BY id').fetchall()

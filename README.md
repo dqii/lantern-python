@@ -281,7 +281,7 @@ cur.execute('SELECT * FROM items ORDER BY embedding <-> %s LIMIT 5', (embedding,
 cur.fetchall()
 ```
 
-## TODO: asyncpg
+## asyncpg
 
 Enable the extension
 
@@ -290,40 +290,23 @@ await conn.execute('CREATE EXTENSION IF NOT EXISTS lantern')
 await conn.execute('CREATE EXTENSION IF NOT EXISTS lantern_extras')
 ```
 
-Register the vector type with your connection
-
-```python
-from pgvector.asyncpg import register_vector
-
-await register_vector(conn)
-```
-
-or your pool
-
-```python
-async def init(conn):
-    await register_vector(conn)
-
-pool = await asyncpg.create_pool(..., init=init)
-```
-
 Create a table
 
 ```python
-await conn.execute('CREATE TABLE items (id bigserial PRIMARY KEY, embedding vector(3))')
+await conn.execute('CREATE TABLE books (id SERIAL PRIMARY KEY, embedding REAL[3])')
 ```
 
 Insert a vector
 
 ```python
-embedding = np.array([1, 2, 3])
-await conn.execute('INSERT INTO items (embedding) VALUES ($1)', embedding)
+embedding = [1, 2, 3]
+await conn.execute('INSERT INTO books (embedding) VALUES ($1)', embedding)
 ```
 
 Get the nearest neighbors to a vector
 
 ```python
-await conn.fetch('SELECT * FROM items ORDER BY embedding <-> $1 LIMIT 5', embedding)
+await conn.fetch('SELECT * FROM books ORDER BY embedding <-> $1 LIMIT 5', embedding)
 ```
 
 ## TODO: Peewee

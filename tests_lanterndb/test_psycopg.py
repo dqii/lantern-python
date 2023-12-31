@@ -20,7 +20,7 @@ class TestPsycopg:
         conn.execute('DELETE FROM items')
 
     def test_works(self):
-        embedding = [1.5, 2, 3]
+        embedding = [1.5, 2.0, 3.0]
         conn.execute('INSERT INTO items (embedding) VALUES (%s), (NULL)', (embedding,))
 
         res = conn.execute('SELECT * FROM items ORDER BY id').fetchall()
@@ -42,7 +42,7 @@ class TestPsycopg:
         await conn.execute('DROP TABLE IF EXISTS items')
         await conn.execute('CREATE TABLE items (id bigserial PRIMARY KEY, embedding REAL[3])')
 
-        embedding = [1.5, 2, 3]
+        embedding = [1.5, 2.0, 3.0]
         await conn.execute('INSERT INTO items (embedding) VALUES (%s), (NULL)', (embedding,))
 
         async with conn.cursor() as cur:

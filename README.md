@@ -205,35 +205,19 @@ Also supports `max_inner_product` and `cosine_distance`
 Enable the extension
 
 ```python
-conn.execute('CREATE EXTENSION IF NOT EXISTS vector')
-```
-
-Register the vector type with your connection
-
-```python
-from pgvector.psycopg import register_vector
-
-register_vector(conn)
-```
-
-For [async connections](https://www.psycopg.org/psycopg3/docs/advanced/async.html), use
-
-```python
-from pgvector.psycopg import register_vector_async
-
-await register_vector_async(conn)
+conn.execute('CREATE EXTENSION IF NOT EXISTS lantern')
 ```
 
 Create a table
 
 ```python
-conn.execute('CREATE TABLE items (id bigserial PRIMARY KEY, embedding vector(3))')
+conn.execute('CREATE TABLE items (id bigserial PRIMARY KEY, embedding REAL[3])')
 ```
 
 Insert a vector
 
 ```python
-embedding = np.array([1, 2, 3])
+embedding = [1, 2, 3]
 conn.execute('INSERT INTO items (embedding) VALUES (%s)', (embedding,))
 ```
 

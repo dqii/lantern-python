@@ -1,5 +1,4 @@
 import numpy as np
-from pgvector.psycopg import register_vector, register_vector_async
 import psycopg
 import pytest
 

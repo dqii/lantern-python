@@ -14,7 +14,6 @@ setup(
     author_email='di@lantern.dev',
     license='MIT',
     packages=[
-        'pgvector.asyncpg',
         'lanterndb.django',
         'pgvector.peewee',
         'pgvector.psycopg',

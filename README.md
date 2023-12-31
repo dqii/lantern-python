@@ -6,7 +6,7 @@ It is based on [pgvector](https://github.com/lanterndata/lantern)'s [Python clie
 
 This library adds support for [Django](https://github.com/django/django), [SQLAlchemy](https://github.com/sqlalchemy/sqlalchemy), [SQLModel](https://github.com/tiangolo/sqlmodel), and [Peewee](https://github.com/coleifer/peewee). [Psycopg 3](https://github.com/psycopg/psycopg), [Psycopg 2](https://github.com/psycopg/psycopg2), and [asyncpg](https://github.com/MagicStack/asyncpg) are supported out of the box; installing this library is not necessary.
 
-[![Build Status](https://github.com/lanterndata/lantern-python/workflows/build/badge.svg?branch=main)](https://github.com/lanterndata/lantern-python/actions)
+[![Build Status](https://github.com/lanterndata/lantern-python/workflows/lanterndb/badge.svg?branch=main)](https://github.com/lanterndata/lantern-python/actions)
 
 ## Installation
 

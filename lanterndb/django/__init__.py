@@ -1,10 +1,23 @@
 from django.contrib.postgres.operations import CreateExtension
 from django.contrib.postgres.indexes import PostgresIndex
 from django.db.models import FloatField, Func, Value
-from lanterndb.utils import to_db
 
 
-__all__ = ['LanternExtension', 'LanternExtrasExtension', 'L2Distance', 'CosineDistance']
+__all__ = ['LanternExtension', 'LanternExtrasExtension', 'L2Distance', 'CosineDistance', 'HnswIndex']
+
+
+def to_db(value):
+    if value is None:
+        return value
+
+    if isinstance(value, np.ndarray):
+        if value.ndim != 1:
+            raise ValueError('expected ndim to be 1')
+        if not np.issubdtype(value.dtype, np.integer) and not np.issubdtype(value.dtype, np.floating):
+            raise ValueError('dtype must be numeric')
+        value = value.tolist()
+
+    return value
 
 
 # TODO: Remove this once we support double precision

@@ -6,14 +6,14 @@ It is based on [pgvector](https://github.com/lanterndata/lantern)'s [Python clie
 
 This library adds support for [Django](https://github.com/django/django), [SQLAlchemy](https://github.com/sqlalchemy/sqlalchemy), [SQLModel](https://github.com/tiangolo/sqlmodel), and [Peewee](https://github.com/coleifer/peewee). [Psycopg 3](https://github.com/psycopg/psycopg), [Psycopg 2](https://github.com/psycopg/psycopg2), and [asyncpg](https://github.com/MagicStack/asyncpg) are supported out of the box; installing this library is not necessary.
 
-[![Build Status](https://github.com/diqi/lantern-python/workflows/lanterndb/badge.svg?branch=main)](https://github.com/diqi/lantern-python/actions)
+[![Build Status](https://github.com/diqi/lantern-python/workflows/lantern/badge.svg?branch=main)](https://github.com/diqi/lantern-python/actions)
 
 ## Installation
 
 Run:
 
 ```sh
-pip install lanterndb
+pip install lantern-django
 ```
 
 And follow the instructions for your database library:
@@ -30,7 +30,7 @@ Create a migration to enable the extension(s)
 
 ```python
 from django.db import migrations
-from lanterndb.django import LanternExtension, LanternExtrasExtension
+from lantern_django import LanternExtension, LanternExtrasExtension
 
 class Migration(migrations.Migration):
     operations = [
@@ -58,7 +58,7 @@ book = Book(book_embedding=[1, 2, 3])
 Find nearest rows with `L2Distance`, `CosineDistance`, or `HammingDistance`
 
 ```python
-from lanterndb.django import L2Distance
+from lantern_django import L2Distance
 
 Book.objects.order_by(L2Distance('embedding', [3, 1, 2]))[:5]
 ```
@@ -67,7 +67,7 @@ Add a vector index
 
 ```python
 from django.db import models
-from lanterndb.django import HnswIndex
+from lantern_django import HnswIndex
 
 class Book(models.Model):
     class Meta:

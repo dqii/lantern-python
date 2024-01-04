@@ -9,8 +9,7 @@ from django.db.migrations.loader import MigrationLoader
 from django.forms import ModelForm
 from math import sqrt
 import numpy as np
-import lanterndb.django
-from lanterndb.django import LanternExtension, LanternExtrasExtension, HnswIndex, L2Distance, CosineDistance, RealField
+from lantern_django import LanternExtension, LanternExtrasExtension, HnswIndex, L2Distance, CosineDistance, RealField
 from unittest import mock
 
 settings.configure(
@@ -63,7 +62,7 @@ class Migration(migrations.Migration):
         ),
         migrations.AddIndex(
             model_name='item',
-            index=lanterndb.django.HnswIndex(
+            index=HnswIndex(
                 fields=['embedding'],
                 m=16,
                 ef=64,

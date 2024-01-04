@@ -4,9 +4,9 @@ with open('README.md', 'r', encoding='utf-8') as fh:
     long_description = fh.read()
 
 setup(
-    name='lantern',
+    name='pgvector',
     version='0.0.0',
-    description='Lantern support for Python',
+    description='pgvector support for Python',
     long_description=long_description,
     long_description_content_type='text/markdown',
     url='https://github.com/lanterndata/lantern-python',
@@ -14,7 +14,6 @@ setup(
     author_email='di@lantern.dev',
     license='MIT',
     packages=[
-        'lanterndb.django',
         'pgvector.peewee',
         'pgvector.psycopg',
         'pgvector.psycopg2',

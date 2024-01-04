@@ -1,4 +1,4 @@
-name: lanterndb
+name: lantern
 on:
   push:
     branches: [ main ]
@@ -27,7 +27,7 @@ jobs:
         with:
           python-version: ${{ matrix.python }}
       - run: pip install -r requirements.txt
-      - run: pytest tests_lanterndb
+      - run: pytest tests_lantern
         env:
           DB_HOST: localhost
           DB_PORT: 5432

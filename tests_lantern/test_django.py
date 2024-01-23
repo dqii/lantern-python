@@ -5,7 +5,6 @@ from django.core import serializers
 from django.db import connection, migrations, models
 from django.contrib.postgres.fields import ArrayField
 from django.db.migrations.loader import MigrationLoader
-from math import sqrt
 import numpy as np
 from lantern_django import LanternExtension, LanternExtrasExtension, HnswIndex, L2Distance, CosineDistance, RealField
 from unittest import mock
@@ -51,6 +50,7 @@ class Migration(migrations.Migration):
 
     operations = [
         LanternExtension(),
+        LanternExtrasExtension(),
         migrations.CreateModel(
             name='Item',
             fields=[
@@ -106,13 +106,11 @@ class TestDjango:
         assert item.id == 1
         assert np.array_equal(np.array(item.embedding), np.array([1, 2, 3]))
 
-    def test_l2_distance(self):
+    def test_l2sq_distance(self):
         create_items()
         distance = L2Distance('embedding', [1, 1, 1])
         items = Item.objects.annotate(distance=distance).order_by(distance)
         assert [v.id for v in items] == [1, 3, 2]
-        # assert [v.distance for v in items] == [0, 1, sqrt(3)]
-        # TODO: Remove this and uncomment above use Euclidean distance instead of squared Euclidean distance
         assert [v.distance for v in items] == [0, 1, 3]
 
     def test_cosine_distance(self):

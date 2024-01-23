@@ -133,8 +133,8 @@ class TestDjango:
         distance = L2Distance('embedding', TextEmbedding(
             'BAAI/bge-small-en', 'hello'))
         results = Item.objects.annotate(distance=distance).order_by('distance')
-        for result in results:
-            print(result.id, result.distance)
+        assert [v.id for v in results] == [1, 3, 2]
+        assert [v.distance for v in results] == [0, 1, 3]
 
     def test_serialization(self):
         create_items()

@@ -142,7 +142,7 @@ class TestDjango:
         distance = L2Distance('embedding', [0] * 384)
         results = Item.objects.annotate(
             distance=distance).order_by('distance')[:1]
-        assert results.query == "SELECT"
+        assert str(results.query) == "SELECT"
 
     def test_serialization(self):
         create_items()

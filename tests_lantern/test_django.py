@@ -6,7 +6,7 @@ from django.db import connection, migrations, models
 from django.contrib.postgres.fields import ArrayField
 from django.db.migrations.loader import MigrationLoader
 import numpy as np
-from lantern_django import LanternExtension, LanternExtrasExtension, HnswIndex, L2Distance, CosineDistance, RealField
+from lantern_django import LanternExtension, LanternExtrasExtension, HnswIndex, L2Distance, CosineDistance, RealField, TextEmbedding
 from unittest import mock
 
 settings.configure(
@@ -127,6 +127,10 @@ class TestDjango:
         distance = L2Distance('embedding', [1, 1, 1])
         items = Item.objects.alias(distance=distance).filter(distance__lt=1)
         assert [v.id for v in items] == [1]
+
+    def test_text_embedding(self):
+        text_embedding = TextEmbedding('BAAI/bge-small-en', 'hello world')
+        assert text_embedding.shape == (384,)
 
     def test_serialization(self):
         create_items()

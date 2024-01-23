@@ -91,7 +91,7 @@ def create_items():
         [1, 1, 2]
     ]
     for i, v in enumerate(vectors):
-        item = Item(id=i + 1, embedding=v)
+        item = Item(id=i + 1, embedding=v + [0] * 381)
         item.save()
 
 
@@ -104,7 +104,8 @@ class TestDjango:
         item.save()
         item = Item.objects.get(pk=1)
         assert item.id == 1
-        assert np.array_equal(np.array(item.embedding), np.array([1, 2, 3]))
+        assert np.array_equal(np.array(item.embedding),
+                              np.array([1, 2, 3] + [0] * 381))
 
     def test_l2sq_distance(self):
         create_items()
@@ -129,8 +130,14 @@ class TestDjango:
         assert [v.id for v in items] == [1]
 
     def test_text_embedding(self):
-        text_embedding = TextEmbedding('BAAI/bge-small-en', 'hello world')
-        assert text_embedding.shape == (384,)
+        results = Item.objects.annotate(
+            text_embedding=TextEmbedding('BAAI/bge-small-en', 'hello')
+        ).extra(
+            select={'distance': 'embedding <-> text_embedding'},
+            order_by=['distance']
+        )
+        for result in results:
+            print(result.id, result.distance)
 
     def test_serialization(self):
         create_items()

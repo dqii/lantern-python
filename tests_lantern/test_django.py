@@ -36,7 +36,7 @@ class Item(models.Model):
                 m=16,
                 ef=64,
                 ef_construction=64,
-                dim=3,
+                dim=384,
                 opclasses=['dist_l2sq_ops']
             )
         ]
@@ -56,7 +56,7 @@ class Migration(migrations.Migration):
             fields=[
                 ('id', models.BigAutoField(auto_created=True,
                  primary_key=True, serialize=False, verbose_name='ID')),
-                ('embedding', ArrayField(RealField(), size=3, null=True)),
+                ('embedding', ArrayField(RealField(), size=384, null=True)),
             ],
         ),
         migrations.AddIndex(
@@ -66,7 +66,7 @@ class Migration(migrations.Migration):
                 m=16,
                 ef=64,
                 ef_construction=64,
-                dim=3,
+                dim=384,
                 name='hnsw_idx',
                 opclasses=['dist_l2sq_ops']
             ),
@@ -100,7 +100,7 @@ class TestDjango:
         Item.objects.all().delete()
 
     def test_works(self):
-        item = Item(id=1, embedding=[1, 2, 3])
+        item = Item(id=1, embedding=[1, 2, 3] + [0] * 381)
         item.save()
         item = Item.objects.get(pk=1)
         assert item.id == 1
@@ -109,14 +109,14 @@ class TestDjango:
 
     def test_l2sq_distance(self):
         create_items()
-        distance = L2Distance('embedding', [1, 1, 1])
+        distance = L2Distance('embedding', [1, 1, 1] + [0] * 381)
         items = Item.objects.annotate(distance=distance).order_by(distance)
         assert [v.id for v in items] == [1, 3, 2]
         assert [v.distance for v in items] == [0, 1, 3]
 
     def test_cosine_distance(self):
         create_items()
-        distance = CosineDistance('embedding', [1, 1, 1])
+        distance = CosineDistance('embedding', [1, 1, 1] + [0] * 381)
         items = Item.objects.annotate(distance=distance).order_by(distance)
         assert [v.id for v in items] == [1, 2, 3]
         # assert [v.distance for v in items] == [0, 0, 0.05719095841793653]
@@ -131,9 +131,8 @@ class TestDjango:
 
     def test_text_embedding(self):
         results = Item.objects.annotate(
-            text_embedding=TextEmbedding('BAAI/bge-small-en', 'hello')
-        ).extra(
-            select={'distance': 'embedding <-> text_embedding'},
+            select={
+                'distance': "embedding <-> text_embedding('BAAI/bge-small-en', 'hello)"},
             order_by=['distance']
         )
         for result in results:
@@ -150,11 +149,11 @@ class TestDjango:
                     obj.save()
 
     def test_clean(self):
-        item = Item(id=1, embedding=[1, 2, 3])
+        item = Item(id=1, embedding=[1, 2, 3] + [0] * 381)
         item.full_clean()
 
     def test_get_or_create(self):
-        Item.objects.get_or_create(embedding=[1, 2, 3])
+        Item.objects.get_or_create(embedding=[1, 2, 3] + [0] * 381)
 
     def test_missing(self):
         Item().save()

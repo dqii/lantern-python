@@ -56,7 +56,8 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='Item',
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
+                ('id', models.BigAutoField(auto_created=True,
+                 primary_key=True, serialize=False, verbose_name='ID')),
                 ('embedding', ArrayField(RealField(), size=3, null=True)),
             ],
         ),
@@ -113,7 +114,8 @@ class TestDjango:
         items = Item.objects.annotate(distance=distance).order_by(distance)
         assert [v.id for v in items] == [1, 3, 2]
         # assert [v.distance for v in items] == [0, 1, sqrt(3)]
-        assert [v.distance for v in items] == [0, 1, 3] # TODO: Remove this and uncomment above use Euclidean distance instead of squared Euclidean distance
+        # TODO: Remove this and uncomment above use Euclidean distance instead of squared Euclidean distance
+        assert [v.distance for v in items] == [0, 1, 3]
 
     def test_cosine_distance(self):
         create_items()
@@ -121,31 +123,14 @@ class TestDjango:
         items = Item.objects.annotate(distance=distance).order_by(distance)
         assert [v.id for v in items] == [1, 2, 3]
         # assert [v.distance for v in items] == [0, 0, 0.05719095841793653]
-        assert [v.distance for v in items] == [0, 0, 0.057191014] # TODO: Remove this and uncomment above when double precision supported
+        # TODO: Remove this and uncomment above when double precision supported
+        assert [v.distance for v in items] == [0, 0, 0.057191014]
 
     def test_filter(self):
         create_items()
         distance = L2Distance('embedding', [1, 1, 1])
         items = Item.objects.alias(distance=distance).filter(distance__lt=1)
         assert [v.id for v in items] == [1]
-
-    # TODO: Uncomment this once we support double precision
-    # def test_avg(self):
-    #     avg = Item.objects.aggregate(Avg('embedding'))['embedding__avg']
-    #     assert avg is None
-    #     Item(embedding=[1, 2, 3]).save()
-    #     Item(embedding=[4, 5, 6]).save()
-    #     avg = Item.objects.aggregate(Avg('embedding'))['embedding__avg']
-    #     assert np.array_equal(avg, np.array([2.5, 3.5, 4.5]))
-
-    # TODO: Uncomment this once we support double precision
-    # def test_sum(self):
-    #     sum = Item.objects.aggregate(Sum('embedding'))['embedding__sum']
-    #     assert sum is None
-    #     Item(embedding=[1, 2, 3]).save()
-    #     Item(embedding=[4, 5, 6]).save()
-    #     sum = Item.objects.aggregate(Sum('embedding'))['embedding__sum']
-    #     assert np.array_equal(sum, np.array([5, 7, 9]))
 
     def test_serialization(self):
         create_items()

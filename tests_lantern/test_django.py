@@ -25,7 +25,7 @@ django.setup()
 
 
 class Item(models.Model):
-    embedding = ArrayField(RealField(), size=3, null=True)
+    embedding = ArrayField(RealField(), size=384, null=True)
 
     class Meta:
         app_label = 'myapp'
@@ -125,16 +125,14 @@ class TestDjango:
 
     def test_filter(self):
         create_items()
-        distance = L2Distance('embedding', [1, 1, 1])
+        distance = L2Distance('embedding', [1, 1, 1] + [0] * 381)
         items = Item.objects.alias(distance=distance).filter(distance__lt=1)
         assert [v.id for v in items] == [1]
 
     def test_text_embedding(self):
-        results = Item.objects.annotate(
-            select={
-                'distance': "embedding <-> text_embedding('BAAI/bge-small-en', 'hello)"},
-            order_by=['distance']
-        )
+        distance = L2Distance('embedding', models.F(
+            "text_embedding('BAAI/bge-small-en', 'hello')"))
+        results = Item.objects.annotate(distance=distance).order_by('distance')
         for result in results:
             print(result.id, result.distance)
 

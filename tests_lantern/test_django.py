@@ -137,7 +137,7 @@ class TestDjango:
         assert [v.id for v in results] == [1, 3, 2]
         assert [v.distance for v in results] == [93.583, 95.45514, 103.85868]
 
-    def test_limit():
+    def test_limit(self):
         create_items()
         distance = L2Distance('embedding', [0] * 384)
         results = Item.objects.annotate(

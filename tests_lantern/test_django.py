@@ -3,10 +3,8 @@ import django
 from django.conf import settings
 from django.core import serializers
 from django.db import connection, migrations, models
-from django.db.models import Avg, Sum
 from django.contrib.postgres.fields import ArrayField
 from django.db.migrations.loader import MigrationLoader
-from django.forms import ModelForm
 from math import sqrt
 import numpy as np
 from lantern_django import LanternExtension, LanternExtrasExtension, HnswIndex, L2Distance, CosineDistance, RealField

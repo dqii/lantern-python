@@ -135,7 +135,7 @@ class TestDjango:
             'BAAI/bge-small-en', 'hello'))
         results = Item.objects.annotate(distance=distance).order_by('distance')
         assert [v.id for v in results] == [1, 3, 2]
-        assert [v.distance for v in results] == [0, 1, 3]
+        assert [v.distance for v in results] == [93.583, 95.45514, 103.85868]
 
     def test_serialization(self):
         create_items()

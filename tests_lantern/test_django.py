@@ -137,6 +137,13 @@ class TestDjango:
         assert [v.id for v in results] == [1, 3, 2]
         assert [v.distance for v in results] == [93.583, 95.45514, 103.85868]
 
+    def test_limit():
+        create_items()
+        distance = L2Distance('embedding', [0] * 384)
+        results = Item.objects.annotate(
+            distance=distance).order_by('distance')[:1]
+        assert results.query == "SELECT"
+
     def test_serialization(self):
         create_items()
         items = Item.objects.all()

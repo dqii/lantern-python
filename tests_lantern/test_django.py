@@ -130,8 +130,8 @@ class TestDjango:
         assert [v.id for v in items] == [1]
 
     def test_text_embedding(self):
-        distance = L2Distance('embedding', models.F(
-            "text_embedding('BAAI/bge-small-en', 'hello')"))
+        distance = L2Distance('embedding', TextEmbedding(
+            'BAAI/bge-small-en', 'hello'))
         results = Item.objects.annotate(distance=distance).order_by('distance')
         for result in results:
             print(result.id, result.distance)
